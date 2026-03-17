@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+:root {
+  --font-head: 'Barlow Condensed';
+  --font-body: 'Barlow';
+  --font-mono: 'JetBrains Mono';
+}
+
+/* ── Scanline overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(13, 217, 196, 0.005) 2px,
+    rgba(13, 217, 196, 0.005) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Custom scrollbars ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1e2d40 transparent;
+}
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: #1e2d40; border-radius: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ── Print layout ── */
+@media print {
+  .sidebar, .topbar, .no-print { display: none !important; }
+  .content { overflow: visible !important; }
+  .page { display: block !important; }
+}
+
+/* ── Animation delay utilities ── */
+.delay-50  { animation-delay: 50ms; }
+.delay-100 { animation-delay: 100ms; }
+.delay-150 { animation-delay: 150ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-250 { animation-delay: 250ms; }
+.delay-300 { animation-delay: 300ms; }

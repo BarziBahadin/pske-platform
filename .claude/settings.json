@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const p = require\\(''./package.json''\\); console.log\\(''@tanstack/react-table:'', p.dependencies[''@tanstack/react-table''] ?? ''NOT INSTALLED''\\)\")",
+      "Bash(git add .)"
+    ]
+  }
+}

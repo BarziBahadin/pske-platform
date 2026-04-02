@@ -17,7 +17,7 @@ import type { BuildingStatus } from '@/types/building'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid, LabelList,
 } from 'recharts'
-import { COLORS } from '@/lib/constants/themeColors'
+import { COLORS, useChartColors } from "@/lib/constants/themeColors"
 
 const STATUS_BADGE: Record<BuildingStatus, React.ComponentProps<typeof Badge>['variant']> = {
   Done:          'done',
@@ -53,6 +53,7 @@ function ProjectTooltip({ active, payload }: { active?: boolean; payload?: Array
 
 export default function ExecutivePage() {
   const contentRef = useRef<HTMLDivElement>(null)
+  const C = useChartColors()
   const { buildings, previousSnapshot, uploadHistory, lastUploadDate } = useProjectStore()
 
   const metrics = useMemo(() => {
@@ -177,14 +178,14 @@ export default function ExecutivePage() {
         <Card accent="amber">
           <SectionHeader title="Project Comparison" subtitle="Avg completion % & budget" />
           <div className="h-[130px] mt-2">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={130} minWidth={0}>
               <BarChart data={projectCompareData} layout="vertical" margin={{ top: 0, right: 48, left: 4, bottom: 0 }}>
                 <XAxis type="number" domain={[0, 100]} hide />
                 <YAxis
                   type="category"
                   dataKey="proj"
                   width={80}
-                  tick={{ fill: COLORS.text2, fontSize: 11, fontFamily: 'monospace' }}
+                  tick={{ fill: C.text2, fontSize: 11, fontFamily: 'monospace' }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -197,7 +198,7 @@ export default function ExecutivePage() {
                     dataKey="pct"
                     position="right"
                     formatter={(v: unknown) => `${v}%`}
-                    style={{ fill: COLORS.text2, fontSize: 11, fontFamily: 'monospace', fontWeight: 700 }}
+                    style={{ fill: C.text2, fontSize: 11, fontFamily: 'monospace', fontWeight: 700 }}
                   />
                 </Bar>
               </BarChart>

@@ -42,7 +42,7 @@ export default function ProgressHistogram({ buildings, height = 160 }: ProgressH
 
   return (
     <div style={{ height }}>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height={height} minWidth={0}>
         <BarChart data={data} margin={{ top: 18, right: 4, left: 0, bottom: 0 }} barCategoryGap="20%">
           <XAxis
             dataKey="label"

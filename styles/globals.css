@@ -1,13 +1,66 @@
 @import "tailwindcss";
 
-:root {
-  --font-head: 'Barlow Condensed';
-  --font-body: 'Barlow';
-  --font-mono: 'JetBrains Mono';
+/* ── Register all design tokens with Tailwind v4 ── */
+@theme {
+  --font-head: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Light mode defaults */
+  --color-bg:           #f0f4f8;
+  --color-bg-2:         #e2eaf3;
+  --color-surface:      #f8fafc;
+  --color-card:         #ffffff;
+  --color-border:       #cbd5e1;
+  --color-border-2:     #b0bec5;
+
+  --color-teal:         #2563eb;
+  --color-teal-2:       #1d4ed8;
+  --color-amber-brand:  #d97706;
+  --color-amber-brand2: #b45309;
+  --color-red:          #dc2626;
+  --color-red-2:        #991b1b;
+  --color-blue:         #3b82f6;
+  --color-blue-2:       #1d4ed8;
+  --color-green-brand:  #16a34a;
+  --color-violet-brand: #7c3aed;
+  --color-pink-brand:   #db2777;
+  --color-orange-brand: #ea580c;
+
+  --color-text:         #0f172a;
+  --color-text-2:       #475569;
+  --color-text-3:       #94a3b8;
 }
 
-/* ── Scanline overlay ── */
-body::before {
+/* ── Dark mode — overrides @theme via cascade ── */
+.dark {
+  --color-bg:           #080c14;
+  --color-bg-2:         #0b1019;
+  --color-surface:      #121a2b;
+  --color-card:         #0e1525;
+  --color-border:       #1e2d4a;
+  --color-border-2:     #25395e;
+
+  --color-teal:         #2563eb;
+  --color-teal-2:       #1d4ed8;
+  --color-amber-brand:  #f59e0b;
+  --color-amber-brand2: #d97706;
+  --color-red:          #ef4444;
+  --color-red-2:        #b91c1c;
+  --color-blue:         #60a5fa;
+  --color-blue-2:       #3b82f6;
+  --color-green-brand:  #22c55e;
+  --color-violet-brand: #a78bfa;
+  --color-pink-brand:   #f472b6;
+  --color-orange-brand: #fb923c;
+
+  --color-text:         #e2eaf5;
+  --color-text-2:       #94a3b8;
+  --color-text-3:       #4a6080;
+}
+
+/* ── Subtle depth overlay (dark only) ── */
+.dark body::before {
   content: '';
   position: fixed;
   inset: 0;
@@ -15,8 +68,8 @@ body::before {
     0deg,
     transparent,
     transparent 2px,
-    rgba(13, 217, 196, 0.005) 2px,
-    rgba(13, 217, 196, 0.005) 4px
+    rgba(37, 99, 235, 0.004) 2px,
+    rgba(37, 99, 235, 0.004) 4px
   );
   pointer-events: none;
   z-index: 9999;
@@ -25,10 +78,10 @@ body::before {
 /* ── Custom scrollbars ── */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #1e2d40 transparent;
+  scrollbar-color: var(--color-border) transparent;
 }
 ::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-thumb { background: #1e2d40; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
 ::-webkit-scrollbar-track { background: transparent; }
 
 /* ── Print layout ── */

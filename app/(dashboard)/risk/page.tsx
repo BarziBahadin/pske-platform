@@ -11,7 +11,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid,
   RadarChart, PolarGrid, PolarAngleAxis, Radar, Legend,
 } from 'recharts'
-import { COLORS } from '@/lib/constants/themeColors'
+import { COLORS, useChartColors } from "@/lib/constants/themeColors"
 import type { BuildingStatus } from '@/types/building'
 
 const RISKS = [
@@ -56,6 +56,7 @@ function RadarTooltip({ active, payload }: { active?: boolean; payload?: Array<{
 
 export default function RiskPage() {
   const contentRef = useRef<HTMLDivElement>(null)
+  const C = useChartColors()
   const { buildings } = useProjectStore()
 
   const riskMetrics = useMemo(() => {
@@ -128,13 +129,13 @@ export default function RiskPage() {
         <Card accent="red">
           <SectionHeader title="Risk Score Chart" subtitle="Sorted by severity" />
           <div className="h-52 mt-2">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={208} minWidth={0}>
               <BarChart data={[...RISKS].sort((a, b) => b.score - a.score)} layout="vertical"
                 margin={{ top: 0, right: 40, left: 4, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} horizontal={false} />
-                <XAxis type="number" domain={[0, 10]} tick={{ fill: COLORS.text3, fontSize: 9 }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={C.border} horizontal={false} />
+                <XAxis type="number" domain={[0, 10]} tick={{ fill: C.text3, fontSize: 9 }} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="id" width={44}
-                  tick={{ fill: COLORS.text2, fontSize: 10, fontFamily: 'monospace' }}
+                  tick={{ fill: C.text2, fontSize: 10, fontFamily: 'monospace' }}
                   axisLine={false} tickLine={false} />
                 <Tooltip content={<RiskTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                 <Bar dataKey="score" radius={[0, 4, 4, 0]} maxBarSize={20}>
@@ -153,14 +154,14 @@ export default function RiskPage() {
         <Card accent="violet">
           <SectionHeader title="Project Health Radar" subtitle="5 dimensions · higher = better" />
           <div className="h-[230px] mt-1">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={230} minWidth={0}>
               <RadarChart data={radarData} margin={{ top: 8, right: 28, left: 28, bottom: 8 }}>
-                <PolarGrid stroke={COLORS.border} />
-                <PolarAngleAxis dataKey="dimension" tick={{ fill: COLORS.text3, fontSize: 9, fontFamily: 'monospace' }} />
+                <PolarGrid stroke={C.border} />
+                <PolarAngleAxis dataKey="dimension" tick={{ fill: C.text3, fontSize: 9, fontFamily: 'monospace' }} />
                 <Radar name="Florya City" dataKey="Florya" stroke={COLORS.teal}  fill={COLORS.teal}  fillOpacity={0.18} strokeWidth={2} />
                 <Radar name="Shary Daik"  dataKey="Shary"  stroke={COLORS.amber} fill={COLORS.amber} fillOpacity={0.18} strokeWidth={2} />
                 <Tooltip content={<RadarTooltip />} />
-                <Legend wrapperStyle={{ fontSize: 10, fontFamily: 'monospace', color: COLORS.text2 }} />
+                <Legend wrapperStyle={{ fontSize: 10, fontFamily: 'monospace', color: C.text2 }} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
@@ -171,15 +172,15 @@ export default function RiskPage() {
         <Card accent="amber">
           <SectionHeader title="Delay Distribution" subtitle="Buildings with date data, grouped by delay bucket" />
           <div className="h-44 mt-2">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={176} minWidth={0}>
               <BarChart data={delayDistData} margin={{ top: 16, right: 8, left: 0, bottom: 0 }} barCategoryGap="25%">
-                <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} vertical={false} />
-                <XAxis dataKey="label" tick={{ fill: COLORS.text2, fontSize: 10, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: COLORS.text3, fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
+                <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: C.text2, fontSize: 10, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: C.text3, fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
                 <Tooltip
                   formatter={(v: unknown) => [`${v} buildings`, 'Count']}
                   contentStyle={{ background: '#141c28', border: '1px solid #1e2d40', borderRadius: 8, fontSize: 11, fontFamily: 'monospace' }}
-                  labelStyle={{ color: COLORS.text2 }}
+                  labelStyle={{ color: C.text2 }}
                   cursor={{ fill: 'rgba(255,255,255,0.03)' }}
                 />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={52}>

@@ -2,7 +2,26 @@
   "permissions": {
     "allow": [
       "Bash(node -e \"const p = require\\(''./package.json''\\); console.log\\(''@tanstack/react-table:'', p.dependencies[''@tanstack/react-table''] ?? ''NOT INSTALLED''\\)\")",
-      "Bash(git add .)"
+      "Bash(git add .)",
+      "Bash(git add lib/constants/seedData.ts lib/derived/computeGantt.ts app/\\\\\\(dashboard\\\\\\)/gantt/page.tsx app/\\\\\\(dashboard\\\\\\)/financial/page.tsx)",
+      "Bash(head -1 /Users/barzibahadin/div/pske-platform/app/\\\\\\(dashboard\\\\\\)/risk/page.tsx)",
+      "Bash(node -e \"const p = require\\(''./package.json''\\); console.log\\(JSON.stringify\\({...p.dependencies, ...p.devDependencies}, null, 2\\)\\)\")",
+      "Bash(git add CLAUDE.md README.md \"app/\\(dashboard\\)/documents/page.tsx\" \"app/\\(dashboard\\)/executive/page.tsx\" \"app/\\(dashboard\\)/field/page.tsx\" \"app/\\(dashboard\\)/financial/page.tsx\" \"app/\\(dashboard\\)/gantt/page.tsx\" \"app/\\(dashboard\\)/overview/page.tsx\" \"app/\\(dashboard\\)/risk/page.tsx\" \"components/ui/Card.tsx\" \"components/ui/KpiCard.tsx\" \"components/ui/ExportPdfButton.tsx\" \"components/charts/ProgressHistogram.tsx\" \"components/charts/StatusDonut.tsx\" \"lib/constants/seedData.ts\" \"lib/derived/computeGantt.ts\" \"lib/excel/parseUpload.ts\" \"lib/store/useDocumentStore.ts\" \"lib/store/useFieldStore.ts\" \"lib/utils/\" \"types/building.ts\" .gitignore)",
+      "Bash(sed -i '' 's/<ResponsiveContainer width=\"\"100%\"\" height=\"\"100%\"\">/<ResponsiveContainer width=\"\"100%\"\" height=\"\"100%\"\" minWidth={0}>/g' \"app/\\(dashboard\\)/executive/page.tsx\" \"app/\\(dashboard\\)/financial/page.tsx\" \"app/\\(dashboard\\)/risk/page.tsx\" \"components/charts/ProgressHistogram.tsx\" \"components/charts/StatusDonut.tsx\")",
+      "Bash(sed -i '' 's/<ResponsiveContainer width=\"\"100%\"\" height={240}>/<ResponsiveContainer width=\"\"100%\"\" height={240} minWidth={0}>/g' \"components/charts/SCurveChart.tsx\")",
+      "Bash(sed -i '' 's/h-\\\\[130px\\\\].*\\\\n.*height=\"\"100%\"\"//' app/\\\\\\(dashboard\\\\\\)/executive/page.tsx)",
+      "Bash(perl -i -0pe 's/\\(h-\\\\[130px\\\\][^>]*>\\)\\\\s*\\\\n\\(\\\\s*<ResponsiveContainer[^>]*\\)height=\"\"100%\"\"/$1\\\\n$2height={130}/g' \"app/\\(dashboard\\)/executive/page.tsx\")",
+      "Bash(perl -i -0pe 's/\\(h-72[^>]*>\\)\\\\s*\\\\n\\(\\\\s*<ResponsiveContainer[^>]*\\)height=\"\"100%\"\"/$1\\\\n$2height={288}/g' \"app/\\(dashboard\\)/financial/page.tsx\")",
+      "Bash(perl -i -0pe 's/\\(h-64[^>]*>\\)\\\\s*\\\\n\\(\\\\s*<ResponsiveContainer[^>]*\\)height=\"\"100%\"\"/$1\\\\n$2height={256}/g' \"app/\\(dashboard\\)/financial/page.tsx\")",
+      "Bash(perl -i -0pe 's/\\(h-52[^>]*>\\)\\\\s*\\\\n\\(\\\\s*<ResponsiveContainer[^>]*\\)height=\"\"100%\"\"/$1\\\\n$2height={208}/g' \"app/\\(dashboard\\)/risk/page.tsx\")",
+      "Bash(perl -i -0pe 's/\\(h-\\\\[230px\\\\][^>]*>\\)\\\\s*\\\\n\\(\\\\s*<ResponsiveContainer[^>]*\\)height=\"\"100%\"\"/$1\\\\n$2height={230}/g' \"app/\\(dashboard\\)/risk/page.tsx\")",
+      "Bash(perl -i -0pe 's/\\(h-44[^>]*>\\)\\\\s*\\\\n\\(\\\\s*<ResponsiveContainer[^>]*\\)height=\"\"100%\"\"/$1\\\\n$2height={176}/g' \"app/\\(dashboard\\)/risk/page.tsx\")",
+      "Bash(for f in \"app/\\(dashboard\\)/executive/page.tsx\" \"app/\\(dashboard\\)/financial/page.tsx\" \"app/\\(dashboard\\)/risk/page.tsx\" \"app/\\(dashboard\\)/overview/page.tsx\" \"app/\\(dashboard\\)/field/page.tsx\" \"components/charts/SCurveChart.tsx\")",
+      "Bash(do)",
+      "Bash(echo \"=== $f ===\")",
+      "Read(//Users/barzibahadin/div/pske-platform/**)",
+      "Bash(done)",
+      "Bash(gh pr view --json number,headRepository)"
     ]
   }
 }

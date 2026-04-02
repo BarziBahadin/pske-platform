@@ -136,16 +136,20 @@ export default function GanttPage() {
             {/* Legend */}
             <div className="flex flex-wrap gap-4 mb-4 text-[10px] font-mono text-text-3">
               <span className="flex items-center gap-1.5">
-                <span className="w-6 h-2.5 rounded inline-block bg-amber-400/25 border border-amber-400/50" />
-                Planned
+                <span className="w-6 h-2.5 rounded inline-block bg-amber-400/15 border border-dashed border-amber-400/50" />
+                Baseline (planned)
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-6 h-2.5 rounded inline-block bg-teal/60" />
+                <span className="w-6 h-3.5 rounded inline-block bg-teal/60" />
                 Actual progress
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-6 h-2.5 rounded inline-block bg-red-400/60" />
+                <span className="w-6 h-2.5 rounded inline-block bg-red-400/50" />
                 Delay overrun
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-6 h-px inline-block" style={{ background: '#f87171' }} />
+                Late start variance
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-px h-3 inline-block bg-teal/70" />
@@ -260,7 +264,7 @@ function GanttRow({ row, todayPct }: { row: GanttRow; todayPct: number }) {
       </div>
 
       {/* Bar area */}
-      <div className="relative h-5 flex items-center">
+      <div className="relative h-6 flex items-center">
         {/* Today marker */}
         {todayPct > 0 && todayPct < 100 && (
           <div
@@ -269,34 +273,46 @@ function GanttRow({ row, todayPct }: { row: GanttRow; todayPct: number }) {
           />
         )}
 
-        {/* Planned bar (background) */}
+        {/* Baseline bar (planned, hollow/dashed) */}
         <div
-          className="absolute top-[5px] h-2.5 rounded bg-amber-400/20 border border-amber-400/40"
+          className="absolute top-[5px] h-2.5 rounded bg-amber-400/15 border border-dashed border-amber-400/50"
           style={{
             left: `${row.planOffsetPct}%`,
             width: `${Math.max(row.planWidthPct, 0.3)}%`,
           }}
         />
 
-        {/* Actual progress bar */}
-        {row.pct > 0 && (
+        {/* Start-variance connector: thin line between planned start and actual start */}
+        {Math.abs(row.actualOffsetPct - row.planOffsetPct) > 0.5 && (
           <div
-            className={`absolute top-[5px] h-2.5 rounded ${
-              row.status === 'Done' ? 'bg-teal/80' : 'bg-teal/55'
-            }`}
+            className="absolute top-[9px] h-px opacity-50"
             style={{
-              left: `${row.planOffsetPct}%`,
-              width: `${row.actualWidthPct}%`,
+              left:       `${Math.min(row.planOffsetPct, row.actualOffsetPct)}%`,
+              width:      `${Math.abs(row.actualOffsetPct - row.planOffsetPct)}%`,
+              background: row.actualOffsetPct > row.planOffsetPct ? '#f87171' : '#4ade80',
             }}
           />
         )}
 
-        {/* Delay overrun bar */}
+        {/* Actual bar — taller, positioned at actual start date */}
+        {row.pct > 0 && (
+          <div
+            className={`absolute top-[3px] h-3.5 rounded ${
+              row.status === 'Done' ? 'bg-teal/85' : 'bg-teal/60'
+            }`}
+            style={{
+              left:  `${row.actualOffsetPct}%`,
+              width: `${Math.max(row.actualWidthPct, 0.3)}%`,
+            }}
+          />
+        )}
+
+        {/* Delay overrun extension — appended past planned end */}
         {row.delayDays > 0 && (
           <div
             className="absolute top-[5px] h-2.5 rounded-r bg-red-400/50 border border-red-400/30"
             style={{
-              left: `${row.planOffsetPct + row.planWidthPct}%`,
+              left:  `${row.planOffsetPct + row.planWidthPct}%`,
               width: `${Math.max(row.delayWidthPct, 0.3)}%`,
             }}
           />

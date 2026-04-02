@@ -12,10 +12,11 @@ export interface GanttRow {
   actualStart: Date
   plannedDays: number
   delayDays: number
-  planOffsetPct: number  // left % within the bar area
-  planWidthPct: number   // width % of planned bar
-  actualWidthPct: number // width % of actual progress bar
-  delayWidthPct: number  // width % of delay extension
+  planOffsetPct: number   // left % of baseline (planned) bar
+  planWidthPct: number    // width % of baseline (planned) bar
+  actualOffsetPct: number // left % of actual bar — may differ from plan if actual start ≠ planned start
+  actualWidthPct: number  // width % of actual bar
+  delayWidthPct: number   // width % of delay overrun extension
 }
 
 export interface GanttDomain {
@@ -48,8 +49,8 @@ export function computeGantt(buildings: Building[]): GanttData | null {
   const msToPct = (ms: number) =>
     Math.min(100, Math.max(0, (ms / totalMs) * 100))
 
-  const today      = new Date()
-  const todayPct   = pctOf(today)
+  const today    = new Date()
+  const todayPct = Math.round(pctOf(today) * 10000) / 10000
 
   const quarters = eachQuarterOfInterval({ start: domainStart, end: domainEnd }).map(q => ({
     label: format(q, "QQQ ''yy"),
@@ -60,20 +61,32 @@ export function computeGantt(buildings: Building[]): GanttData | null {
     const ps  = parseISO(b.plannedStart!)
     const pe  = parseISO(b.plannedEnd!)
     const as_ = parseISO(b.actualStart!)
-    const plannedDays  = differenceInDays(pe, ps)
-    const delayDays    = b.delayDays ?? 0
-    const planMs       = pe.getTime() - ps.getTime()
+    const plannedDays = differenceInDays(pe, ps)
+    const delayDays   = b.delayDays ?? 0
+    const planMs      = pe.getTime() - ps.getTime()
 
-    const planOffsetPct  = pctOf(ps)
-    const planWidthPct   = msToPct(planMs)
-    const actualWidthPct = planWidthPct * b.pct
-    const delayWidthPct  = delayDays > 0 ? msToPct(delayDays * 86_400_000) : 0
+    const planOffsetPct   = pctOf(ps)
+    const planWidthPct    = msToPct(planMs)
+    const actualOffsetPct = pctOf(as_)
+
+    // Actual bar width: use actualEnd for Done buildings; otherwise estimate from pct of planned duration
+    let actualWidthPct: number
+    if (b.status === 'Done' && b.actualEnd) {
+      const ae = parseISO(b.actualEnd)
+      actualWidthPct = msToPct(ae.getTime() - as_.getTime())
+    } else {
+      actualWidthPct = msToPct(planMs * b.pct)
+    }
+
+    const delayWidthPct = delayDays > 0 ? msToPct(delayDays * 86_400_000) : 0
 
     return {
       bldg: b.bldg, proj: b.proj, desc: b.desc, status: b.status, pct: b.pct,
       plannedStart: ps, plannedEnd: pe, actualStart: as_,
       plannedDays, delayDays,
-      planOffsetPct, planWidthPct, actualWidthPct, delayWidthPct,
+      planOffsetPct, planWidthPct,
+      actualOffsetPct, actualWidthPct,
+      delayWidthPct,
     }
   })
 

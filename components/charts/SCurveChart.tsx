@@ -14,7 +14,7 @@ import {
   Dot,
 } from 'recharts'
 import type { SCurvePoint } from '@/lib/derived/computeSCurve'
-import { COLORS } from '@/lib/constants/themeColors'
+import { useChartColors, COLORS } from '@/lib/constants/themeColors'
 
 interface Props {
   data: SCurvePoint[]
@@ -35,27 +35,28 @@ function CustomTooltip({ active, payload, label }: any) {
 }
 
 export default function SCurveChart({ data }: Props) {
+  const C = useChartColors()
   const hasPlanned = data.some(d => d.planned !== undefined)
   const hasMultiple = data.length > 1
 
   return (
-    <ResponsiveContainer width="100%" height={240}>
+    <ResponsiveContainer width="100%" height={240} minWidth={0}>
       <ComposedChart data={data} margin={{ top: 8, right: 12, left: -8, bottom: 0 }}>
         <CartesianGrid
           strokeDasharray="3 3"
-          stroke={COLORS.border}
+          stroke={C.border}
           vertical={false}
         />
         <XAxis
           dataKey="date"
-          tick={{ fill: COLORS.text3, fontSize: 10, fontFamily: 'JetBrains Mono' }}
+          tick={{ fill: C.text3, fontSize: 10, fontFamily: 'JetBrains Mono' }}
           tickLine={false}
-          axisLine={{ stroke: COLORS.border }}
+          axisLine={{ stroke: C.border }}
           interval="preserveStartEnd"
         />
         <YAxis
           domain={[0, 100]}
-          tick={{ fill: COLORS.text3, fontSize: 10, fontFamily: 'JetBrains Mono' }}
+          tick={{ fill: C.text3, fontSize: 10, fontFamily: 'JetBrains Mono' }}
           tickLine={false}
           axisLine={false}
           tickFormatter={(v) => `${v}%`}
@@ -63,7 +64,7 @@ export default function SCurveChart({ data }: Props) {
         <Tooltip content={<CustomTooltip />} />
         {(hasPlanned || hasMultiple) && (
           <Legend
-            wrapperStyle={{ fontSize: 11, fontFamily: 'JetBrains Mono', color: COLORS.text2 }}
+            wrapperStyle={{ fontSize: 11, fontFamily: 'JetBrains Mono', color: C.text2 }}
             iconType="circle"
             iconSize={6}
           />

@@ -10,7 +10,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
   CartesianGrid, Cell, LabelList, ReferenceLine,
 } from 'recharts'
-import { COLORS } from '@/lib/constants/themeColors'
+import { COLORS, useChartColors } from "@/lib/constants/themeColors"
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -67,6 +67,7 @@ function CpiTooltip({ active, payload, label }: {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function FinancialPage() {
+  const C = useChartColors()
   const contentRef = useRef<HTMLDivElement>(null)
   const { buildings } = useProjectStore()
 
@@ -213,27 +214,27 @@ export default function FinancialPage() {
           subtitle="Top 10 packages by contract value · $M"
         />
         <div className="h-72 mt-2">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={288} minWidth={0}>
             <BarChart data={packageData} margin={{ top: 4, right: 8, left: 0, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={C.border} vertical={false} />
               <XAxis
                 dataKey="name"
-                tick={{ fill: COLORS.text2, fontSize: 9, fontFamily: 'monospace' }}
-                axisLine={{ stroke: COLORS.border }}
+                tick={{ fill: C.text2, fontSize: 9, fontFamily: 'monospace' }}
+                axisLine={{ stroke: C.border }}
                 tickLine={false}
                 angle={-35}
                 textAnchor="end"
                 interval={0}
               />
               <YAxis
-                tick={{ fill: COLORS.text3, fontSize: 9, fontFamily: 'monospace' }}
+                tick={{ fill: C.text3, fontSize: 9, fontFamily: 'monospace' }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={v => `$${v}M`}
                 width={46}
               />
               <Tooltip content={<BudgetTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-              <Legend wrapperStyle={{ fontSize: 10, fontFamily: 'monospace', color: COLORS.text2, paddingTop: 8 }} />
+              <Legend wrapperStyle={{ fontSize: 10, fontFamily: 'monospace', color: C.text2, paddingTop: 8 }} />
               <Bar dataKey="Budget" fill={COLORS.amber}  fillOpacity={0.45} radius={[3,3,0,0]} maxBarSize={24} />
               <Bar dataKey="Earned" fill={COLORS.teal}   fillOpacity={0.80} radius={[3,3,0,0]} maxBarSize={24} />
               <Bar dataKey="Actual" fill={COLORS.violet} fillOpacity={0.70} radius={[3,3,0,0]} maxBarSize={24} />
@@ -250,13 +251,13 @@ export default function FinancialPage() {
           <Card accent="red">
             <SectionHeader title="CPI per Building" subtitle="Sorted worst → best · 1.00 = on budget" />
             <div className="h-64 mt-2">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height={256} minWidth={0}>
                 <BarChart data={cpiData} layout="vertical" margin={{ top: 0, right: 56, left: 4, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={COLORS.border} horizontal={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={C.border} horizontal={false} />
                   <XAxis
                     type="number"
                     domain={[0.6, 1.2]}
-                    tick={{ fill: COLORS.text3, fontSize: 9 }}
+                    tick={{ fill: C.text3, fontSize: 9 }}
                     axisLine={false}
                     tickLine={false}
                     tickCount={7}
@@ -265,7 +266,7 @@ export default function FinancialPage() {
                     type="category"
                     dataKey="name"
                     width={52}
-                    tick={{ fill: COLORS.text2, fontSize: 9, fontFamily: 'monospace' }}
+                    tick={{ fill: C.text2, fontSize: 9, fontFamily: 'monospace' }}
                     axisLine={false}
                     tickLine={false}
                   />
@@ -279,7 +280,7 @@ export default function FinancialPage() {
                       dataKey="cpi"
                       position="right"
                       formatter={(v: unknown) => Number(v).toFixed(2)}
-                      style={{ fill: COLORS.text2, fontSize: 9, fontFamily: 'monospace' }}
+                      style={{ fill: C.text2, fontSize: 9, fontFamily: 'monospace' }}
                     />
                   </Bar>
                 </BarChart>

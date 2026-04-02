@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { NAV_ROUTES } from '@/lib/constants/routes'
 import { useProjectStore } from '@/lib/store/useProjectStore'
 import { useUIStore } from '@/lib/store/useUIStore'
@@ -25,7 +25,8 @@ function fmt(n: number) {
 export default function Topbar() {
   const pathname = usePathname()
   const { buildings, lastUploadDate } = useProjectStore()
-  const { openMobile } = useUIStore()
+  const { openMobile, theme, toggleTheme, alertCount } = useUIStore()
+  const router = useRouter()
 
   const { totalCost, avgPct, floryaCount, sharyCount } = useMemo(() => {
     const totalCost = buildings.reduce((s, b) => s + b.cost, 0)
@@ -93,13 +94,27 @@ export default function Topbar() {
           <span className="text-[9px] text-text-3 tracking-[1px] uppercase">Data</span>
         </div>
 
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className="w-8 h-8 bg-surface border border-border rounded-[5px] flex items-center justify-center text-sm text-text-2 hover:text-text transition-colors"
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? '☀' : '🌙'}
+        </button>
+
         {/* Alert bell */}
         <button
-          className="w-8 h-8 bg-surface border border-border rounded-[5px] flex items-center justify-center text-sm text-text-2 relative"
-          title="3 alerts"
+          onClick={() => router.push('/risk')}
+          className="w-8 h-8 bg-surface border border-border rounded-[5px] flex items-center justify-center text-sm text-text-2 hover:text-text transition-colors relative"
+          title={`${alertCount} alerts — view Risk page`}
         >
           🔔
-          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red rounded-full font-mono text-[8px] text-white flex items-center justify-center leading-none">3</span>
+          {alertCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full font-mono text-[8px] text-white flex items-center justify-center leading-none">
+              {alertCount > 9 ? '9+' : alertCount}
+            </span>
+          )}
         </button>
       </div>
     </header>

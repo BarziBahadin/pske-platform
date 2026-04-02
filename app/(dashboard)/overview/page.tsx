@@ -13,8 +13,12 @@ import {
 } from '@tanstack/react-table'
 import { useProjectStore } from '@/lib/store/useProjectStore'
 import Card from '@/components/ui/Card'
+import KpiCard from '@/components/ui/KpiCard'
 import Badge from '@/components/ui/Badge'
+import StatusDonut from '@/components/charts/StatusDonut'
+import ProgressHistogram from '@/components/charts/ProgressHistogram'
 import type { Building, BuildingStatus } from '@/types/building'
+import { COLORS } from '@/lib/constants/themeColors'
 
 // ── Column config ─────────────────────────────────────────────────────────────
 
@@ -149,6 +153,28 @@ export default function OverviewPage() {
   // Derive visible column count for display
   const hiddenCount = Object.values(columnVisibility).filter(v => v === false).length
 
+  // Chart data derived from ALL buildings (not filtered)
+  const donutData = useMemo(() => {
+    const counts: Record<string, number> = {}
+    buildings.forEach(b => { counts[b.status] = (counts[b.status] ?? 0) + 1 })
+    const colorMap: Record<string, string> = {
+      'Done': COLORS.teal, 'in progress': COLORS.blue,
+      'Stopped': COLORS.red, 'Pending': COLORS.amber, 'Collaps': COLORS.violet,
+    }
+    return Object.entries(counts)
+      .map(([name, value]) => ({ name, value, color: colorMap[name] ?? COLORS.text2 }))
+      .sort((a, b) => b.value - a.value)
+  }, [buildings])
+
+  const summaryMetrics = useMemo(() => {
+    const done = buildings.filter(b => b.status === 'Done').length
+    const delayed = buildings.filter(b => (b.delayDays ?? 0) > 0).length
+    const totalCost = buildings.reduce((s, b) => s + b.cost, 0)
+    const ev = buildings.reduce((s, b) => s + b.cost * b.pct, 0)
+    const fmt = (n: number) => n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` : `$${(n / 1_000).toFixed(0)}K`
+    return { done, delayed, totalCost, ev, fmt }
+  }, [buildings])
+
   return (
     <div className="max-w-[1400px] space-y-4">
       <div className="flex items-start justify-between flex-wrap gap-2">
@@ -157,6 +183,29 @@ export default function OverviewPage() {
           <p className="text-xs text-text-3 mt-1 font-mono">
             {totalFiltered} of {buildings.length} buildings
           </p>
+        </div>
+      </div>
+
+      {/* Summary charts row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card accent="teal">
+          <p className="text-[10px] font-mono text-text-3 uppercase tracking-wider mb-1">Status Breakdown</p>
+          <StatusDonut data={donutData} totalLabel="buildings" totalValue={buildings.length} height={180} />
+        </Card>
+        <Card accent="blue">
+          <p className="text-[10px] font-mono text-text-3 uppercase tracking-wider mb-1">Progress Distribution</p>
+          <ProgressHistogram buildings={buildings} height={160} />
+        </Card>
+        <div className="flex flex-col gap-3">
+          <KpiCard label="Completed Buildings" value={summaryMetrics.done}
+            sub={`${Math.round(summaryMetrics.done / buildings.length * 100)}% of total`}
+            icon="✓" accent="green" />
+          <KpiCard label="Delayed Buildings" value={summaryMetrics.delayed}
+            sub="Buildings with delayDays > 0"
+            icon="⚠" accent={summaryMetrics.delayed > 0 ? 'red' : 'neutral'} />
+          <KpiCard label="Earned Value" value={summaryMetrics.fmt(summaryMetrics.ev)}
+            sub={`of ${summaryMetrics.fmt(summaryMetrics.totalCost)} budget`}
+            icon="◉" accent="amber" />
         </div>
       </div>
 

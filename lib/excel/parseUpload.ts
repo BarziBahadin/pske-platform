@@ -43,6 +43,9 @@ const COL_MAP: Record<string, string> = {
   '% of duration remaining': 'durationPctRemaining',   'duration remaining': 'durationPctRemaining',
   '% of duration completed': 'durationPctCompleted',   'duration completed': 'durationPctCompleted',
   '(delay) day': 'delayDays',   'delay day': 'delayDays',   'delay days': 'delayDays',   'delay': 'delayDays',
+  // Actual cost (AC) — enables real CPI calculation
+  'actual cost': 'actualCost',   'ac': 'actualCost',   'actual expenditure': 'actualCost',
+  'cost to date': 'actualCost',  'spent': 'actualCost', 'actual cost to date': 'actualCost',
 }
 
 // ── Zod schema ───────────────────────────────────────────────────────────────
@@ -66,6 +69,7 @@ const RawRowSchema = z.object({
   delayDays:           z.coerce.number().optional(),
   durationPctRemaining: z.coerce.number().min(0).optional(),
   durationPctCompleted: z.coerce.number().min(0).optional(),
+  actualCost:           z.coerce.number().nonnegative().optional(),
 })
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -174,6 +178,7 @@ export function parseExcelBuffer(buffer: ArrayBuffer): ParseResult {
       delayDays:            d.delayDays ?? undefined,
       durationPctRemaining: d.durationPctRemaining != null ? normalizePct(d.durationPctRemaining) : undefined,
       durationPctCompleted: d.durationPctCompleted != null ? normalizePct(d.durationPctCompleted) : undefined,
+      actualCost:           d.actualCost ?? undefined,
     })
   }
 

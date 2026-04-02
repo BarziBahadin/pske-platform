@@ -21,6 +21,7 @@ export interface Building {
   delayDays?: number          // (Delay) Day — positive = behind, negative = ahead
   durationPctRemaining?: number  // % of Duration Remaining (0–1)
   durationPctCompleted?: number  // % of Duration Completed (0–1)
+  actualCost?: number            // Actual Cost (AC) spent to date — enables real CPI
   salesStatus?: SalesStatus
   salePrice?: number
 }

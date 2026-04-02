@@ -1,37 +1,6 @@
 # P-SKE Construction Intelligence Platform
 
-A professional construction project management control center built with Next.js 16, TypeScript, and Tailwind CSS. Tracks **386 buildings** across two major projects — **Florya City** and **Shary Daik** — with support for daily Excel uploads to drive all data dynamically.
-
----
-
-## Table of Contents
-
-1. [Overview](#overview)
-2. [Tech Stack](#tech-stack)
-3. [Project Structure](#project-structure)
-4. [Getting Started](#getting-started)
-5. [Design System](#design-system)
-6. [Data Architecture](#data-architecture)
-7. [Pages & Features](#pages--features)
-8. [Zustand Stores](#zustand-stores)
-9. [UI Components](#ui-components)
-10. [Phase Roadmap](#phase-roadmap)
-11. [Excel Upload Schema (Phase 2)](#excel-upload-schema-phase-2)
-12. [Contributing](#contributing)
-
----
-
-## Overview
-
-P-SKE manages a construction portfolio of 386 buildings with a total contract value of ~$210.7M. This platform replaces a static single-file HTML dashboard with a fully reactive, data-driven application.
-
-**Key capabilities (Phase 1):**
-- Portfolio-wide KPI dashboard with live progress metrics
-- 386-row sortable, filterable, paginated buildings register
-- Status tracking: Done / In Progress / Stopped / Pending / Collapsed
-- Zustand state persisted to localStorage — survives page reload
-- Snapshot comparison foundation — upload new data, see delta vs previous
-- 10 navigable sections with collapsible sidebar
+A full-stack construction portfolio management dashboard for **P-SKE**, tracking **386 buildings** across two active projects in Iraq — **Florya City** and **Shary Daik** — with a total contract value of ~$210.7M. Migrated from a static single-file HTML dashboard to a fully reactive, data-driven application driven by daily Excel uploads.
 
 ---
 
@@ -39,17 +8,88 @@ P-SKE manages a construction portfolio of 386 buildings with a total contract va
 
 | Layer | Technology | Version |
 |-------|-----------|---------|
-| Framework | Next.js (App Router) | 16.1.6 |
+| Framework | Next.js (App Router, Turbopack) | 16.x |
 | Language | TypeScript (strict) | 5.x |
 | Styling | Tailwind CSS v4 | 4.x |
 | State | Zustand (persist middleware) | 5.x |
 | Charts | Recharts | 3.x |
 | Tables | TanStack Table | 8.x |
-| Excel | SheetJS (xlsx) | 0.18.5 |
-| Validation | Zod | 4.x |
+| Excel | SheetJS (xlsx) + Zod | 0.18.5 / 4.x |
 | Toast | Sonner | 2.x |
-| PDF Export | jsPDF + html2canvas | Phase 7 |
+| PDF Export | jsPDF + html2canvas | latest |
 | Dates | date-fns | 4.x |
+
+---
+
+## Features
+
+### Phase 1 — Foundation
+- Next.js 16 scaffold with App Router `(dashboard)` route group
+- Custom P-SKE dark design system with teal/amber/red accent tokens
+- Zustand stores: `useProjectStore`, `useConfigStore`, `useUIStore`
+- 7 reusable UI primitives: `Card`, `KpiCard`, `Badge`, `ProgressRing`, `SectionHeader`, `TrendArrow`, `EmptyState`
+- Responsive sidebar (collapsible on desktop, overlay drawer on mobile)
+- 11 dashboard pages scaffolded
+
+### Phase 2 — Excel Import Pipeline
+- Drag-and-drop Excel upload with SheetJS parsing
+- Fuzzy column header matching via `COL_MAP` (handles client typos like "Discription", "% of Duration Remaine")
+- Zod schema validation with per-row error reporting
+- Upload history (last 10 snapshots), snapshot comparison for trend arrows
+- Dynamic Topbar: live portfolio cost, avg progress %, last upload date
+
+### Phase 3 — Executive S-Curve
+- `computeSCurve()` derives monthly planned vs actual cumulative progress
+- Recharts `ComposedChart`: teal filled area (actual) + amber dashed line (planned)
+- Snapshot delta table showing what changed since last upload with `TrendArrow` indicators
+
+### Phase 4 — TanStack Table
+- Overview rebuilt with TanStack Table v8
+- Column sorting, pagination (25/page), column visibility toggle
+- Columns: #, Building, Project, Description, Status, Progress, Cost, Delay
+
+### Phase 5 — Gantt Schedule
+- CSS-based Gantt bars: planned (blue), actual (teal), delay (red) per building
+- Today marker, horizontal scroll
+- KPIs: On Schedule, Delayed, Avg Delay, Total Duration
+- Project + search filters
+
+### Phase 6 — Financial EVM
+- Full Earned Value Management: BAC, EV, AC, CPI, SPI, EAC, ETC, VAC, CV
+- Real CPI/EAC calculated when `actualCost` column is present in uploaded Excel
+- 8 KPI cards with color-coded health (≥0.95 teal, <0.95 red)
+- Budget vs Earned vs Actual 3-bar chart (top 10 packages)
+- CPI per building horizontal bar chart with reference line at 1.0
+- Per-project EVM breakdown table
+
+### Phase 7 — PDF Export
+- `exportToPdf()` — html2canvas DOM capture → multi-page A4 PDF (jsPDF)
+- Header strip per page: P-SKE branding, report title, date + page counter, teal accent line
+- `ExportPdfButton` component — loading spinner, auto-hidden from PDF via `no-print` class
+- Available on: Executive, Financial, Risk, Gantt, Field Operations, Documents
+
+### Phase 8 — Field Operations & Document DMS
+- **Photo Log**: upload + auto-compress images (max 900px JPEG), link to building, thumbnail grid, stored in Zustand/localStorage
+- **Defect Tracker**: add/remove defects, status lifecycle (`open → in-review → resolved → closed`), priority levels (low/medium/high/critical), filter tabs, seeded with 5 realistic defects
+- **Document DMS**: register documents by title/type/project/date, search + type/project filters, type breakdown cards, seeded with 7 project documents
+
+---
+
+## Pages
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/executive` | Executive Summary | S-Curve chart, KPIs, snapshot delta table, trend arrows |
+| `/overview` | Project Overview | TanStack Table — all 386 buildings with sort/filter/pagination |
+| `/gantt` | Gantt Schedule | CSS Gantt — planned vs actual vs delay bars, today marker |
+| `/financial` | Financial | Full EVM: CPI/SPI/EAC/ETC/VAC/CV, 3-bar chart, CPI per building |
+| `/risk` | Schedule & Risk | Risk register, delay distribution chart, project health radar |
+| `/field` | Field Operations | Active sites list, photo log, defect tracker |
+| `/documents` | Documents | Document DMS — register, search, filter by type/project |
+| `/sales` | Sales & Marketing | Unit sales pipeline |
+| `/engineering` | Engineering | Engineering issues dashboard |
+| `/upload` | Data Upload | Excel drag-and-drop import with validation |
+| `/settings` | Settings | Project config, upload history, data reset |
 
 ---
 
@@ -57,99 +97,101 @@ P-SKE manages a construction portfolio of 386 buildings with a total contract va
 
 ```
 pske-platform/
-│
-├── app/                              # Next.js App Router
-│   ├── layout.tsx                    # Root layout — imports globals.css + Toaster
-│   ├── page.tsx                      # Redirects / → /executive
-│   └── (dashboard)/                  # Route group (shared sidebar/topbar shell)
-│       ├── layout.tsx                # Dashboard shell: Sidebar + Topbar + <main>
-│       ├── executive/page.tsx        # Portfolio KPIs, progress rings, status breakdown
-│       ├── overview/page.tsx         # Full buildings register (sort/filter/paginate)
-│       ├── gantt/page.tsx            # Gantt schedule (Phase 2)
-│       ├── engineering/page.tsx      # RFI tracker, engineering issues
-│       ├── field/page.tsx            # Active sites, photo log (Phase 2)
-│       ├── financial/page.tsx        # EAC/ETC/SPI earned value metrics
-│       ├── sales/page.tsx            # Unit sales & availability
-│       ├── risk/page.tsx             # Risk register
-│       ├── documents/page.tsx        # Document library
-│       └── settings/page.tsx         # App config + data management
+├── app/
+│   ├── (dashboard)/
+│   │   ├── layout.tsx           # Sidebar + Topbar shell
+│   │   ├── executive/page.tsx   # S-curve + delta + KPIs
+│   │   ├── overview/page.tsx    # TanStack Table
+│   │   ├── gantt/page.tsx       # CSS Gantt chart
+│   │   ├── financial/page.tsx   # EVM dashboard
+│   │   ├── risk/page.tsx        # Risk register + radar
+│   │   ├── field/page.tsx       # Photo log + defect tracker
+│   │   ├── documents/page.tsx   # Document DMS
+│   │   └── ...
+│   └── layout.tsx               # Root layout
 │
 ├── components/
+│   ├── charts/
+│   │   └── SCurveChart.tsx      # Recharts S-curve (actual + planned)
 │   ├── layout/
-│   │   ├── Sidebar.tsx               # Collapsible nav (section-grouped, teal active bar)
-│   │   └── Topbar.tsx                # Header with portfolio summary pills
-│   └── ui/                           # Reusable UI primitives
-│       ├── Card.tsx                  # Base card container
-│       ├── Badge.tsx                 # Status/type chip with variants
-│       ├── KpiCard.tsx               # Metric card (value + trend arrow)
-│       ├── ProgressRing.tsx          # SVG circular progress indicator
-│       ├── SectionHeader.tsx         # h2 + subtitle + action slot
-│       ├── TrendArrow.tsx            # Delta indicator (up/down arrow)
-│       └── EmptyState.tsx            # Centered placeholder content
+│   │   ├── Sidebar.tsx          # Collapsible nav, mobile overlay drawer
+│   │   └── Topbar.tsx           # Live portfolio pills, hamburger
+│   └── ui/                      # Card, Badge, KpiCard, ProgressRing,
+│                                 # SectionHeader, TrendArrow, EmptyState,
+│                                 # ExportPdfButton
 │
 ├── lib/
 │   ├── constants/
-│   │   ├── seedData.ts               # SEED_BUILDINGS: Building[] (all 386, typed)
-│   │   ├── routes.ts                 # NAV_ROUTES — 10 navigation items
-│   │   └── themeColors.ts            # COLORS, STATUS_COLORS for Recharts
-│   └── store/
-│       ├── useUIStore.ts             # Sidebar state (not persisted)
-│       ├── useProjectStore.ts        # Buildings + upload history (persisted)
-│       └── useConfigStore.ts         # Project configs + currency (persisted)
+│   │   ├── seedData.ts          # 386 seed buildings (typed)
+│   │   ├── routes.ts            # NAV_ROUTES array
+│   │   └── themeColors.ts       # COLORS, STATUS_COLORS for Recharts
+│   ├── derived/
+│   │   ├── computeSCurve.ts     # computeSCurve() + computeDeltas()
+│   │   └── computeGantt.ts      # computeGantt() + groupGanttRows()
+│   ├── excel/
+│   │   └── parseUpload.ts       # SheetJS + Zod + COL_MAP pipeline
+│   ├── store/
+│   │   ├── useProjectStore.ts   # buildings + upload history (persisted)
+│   │   ├── useConfigStore.ts    # project configs + currency (persisted)
+│   │   ├── useUIStore.ts        # sidebar state (not persisted)
+│   │   ├── useFieldStore.ts     # photos + defects (persisted)
+│   │   └── useDocumentStore.ts  # document registry (persisted)
+│   └── utils/
+│       └── exportPdf.ts         # multi-page A4 PDF generator
 │
 ├── types/
-│   ├── building.ts                   # Building interface + BuildingStatus + SalesStatus
-│   ├── snapshot.ts                   # UploadSnapshot interface
-│   ├── gantt.ts                      # GanttTask interface
-│   ├── risk.ts                       # RiskItem interface
-│   ├── defect.ts                     # Defect interface
-│   ├── financial.ts                  # FinancialPeriod, EarnedValue
-│   ├── document.ts                   # ProjectDocument interface
-│   └── config.ts                     # AppConfig, ProjectConfig, Currency
+│   ├── building.ts              # Building interface + BuildingStatus
+│   ├── snapshot.ts              # UploadSnapshot interface
+│   └── config.ts                # AppConfig, ProjectConfig
 │
-├── styles/
-│   └── globals.css                   # Google Fonts + Tailwind base + custom overrides
-│
-├── tailwind.config.ts                # P-SKE design tokens (auto-detected by postcss)
-├── CLAUDE.md                         # AI assistant instructions for this codebase
-└── package.json
+├── styles/globals.css
+├── tailwind.config.ts           # P-SKE design tokens
+└── CLAUDE.md                    # AI assistant instructions
 ```
 
 ---
 
-## Getting Started
+## Data Rules
 
-### Prerequisites
-- Node.js 20+
-- npm 10+
+- `Building.pct` is **0.0 – 1.0** — always multiply by 100 for display
+- `Building.proj` exact values: `'Florya City'` | `'Shary Daik'`
+- `BuildingStatus`: `'Done' | 'in progress' | 'Stopped' | 'Pending' | 'Collaps'`
+- Never hardcode building counts or contract values in pages — always derive from `useProjectStore`
 
-### Install & Run
+---
 
-```bash
-# Navigate to the project
-cd /Users/barzibahadin/div/pske-platform
+## Excel Upload Schema
 
-# Install dependencies (already done)
-npm install
+The Excel file should have one row per building. Column headers are matched fuzzily — both exact names and common variants are recognized:
 
-# Start development server
-npm run dev
-```
+| Field | Example headers | Required |
+|-------|----------------|----------|
+| Sequence # | `N`, `No` | Yes |
+| Project | `Project`, `Project Name` | Yes |
+| Building | `Building`, `Bldg` | Yes |
+| Description | `Description`, `Discription` | Yes |
+| Cost | `Grand Total Cost $`, `Contract Value` | Yes |
+| Status | `Status` | Yes |
+| Progress | `Actual % Complete Current Month`, `% Complete` | Yes |
+| Planned Start | `Planned Start`, `Plan Start` | No |
+| Planned End | `Planned End`, `Plan End` | No |
+| Actual Start | `Actual Start`, `Act Start` | No |
+| Actual End | `Actual End`, `Act End` | No |
+| Delay Days | `(Delay) Day`, `Delay Days` | No |
+| Actual Cost | `Actual Cost`, `AC`, `Cost to Date` | No (enables real CPI) |
+| Duration % Remaining | `% of Duration Remaine`, `Duration Remaining` | No |
 
-Open [http://localhost:3000](http://localhost:3000) — the root redirects to `/executive`.
+---
 
-### Build for Production
+## Zustand Stores
 
-```bash
-npm run build    # must pass with 0 errors
-npm run start    # serve the production build
-```
-
-### Type Check
-
-```bash
-npx tsc --noEmit
-```
+| Store | Persist key | Contents |
+|-------|-------------|----------|
+| `useProjectStore` | `pske_project_v1` | buildings, previousSnapshot, uploadHistory, lastUploadDate |
+| `useConfigStore` | `pske_config_v1` | project configs, reporting currency |
+| `useFieldStore` | `pske_field_v1` | photos (base64), defects |
+| `useDocumentStore` | `pske_docs_v1` | document metadata |
+| `useUIStore` | — (not persisted) | sidebarCollapsed, mobileOpen |
 
 ---
 
@@ -160,361 +202,42 @@ npx tsc --noEmit
 | Token | Hex | Usage |
 |-------|-----|-------|
 | `bg-bg` | `#070a0f` | Page background |
-| `bg-bg-2` | `#0c1018` | Sidebar background |
-| `bg-surface` | `#111827` | Input backgrounds, badges |
 | `bg-card` | `#141c28` | Card backgrounds |
+| `bg-surface` | `#111827` | Input backgrounds |
 | `border-border` | `#1e2d40` | All borders |
-| `text-teal` | `#0dd9c4` | Primary accent, active states |
-| `text-[#f5a623]` | `#f5a623` | Amber accent (Shary Daik) |
+| `text-teal` | `#0dd9c4` | Primary accent |
+| `text-amber-brand` | `#f5a623` | Amber accent |
 | `text-text` | `#e2eaf5` | Primary text |
 | `text-text-2` | `#94a3b8` | Secondary text |
-| `text-text-3` | `#4a5e78` | Tertiary / label text |
+| `text-text-3` | `#4a5e78` | Labels / tertiary |
 
 ### Typography
 
 | Class | Font | Usage |
 |-------|------|-------|
-| `font-head` | Barlow Condensed | Page titles, section headers, KPI values |
-| `font-body` | Barlow | Body text, labels, descriptions |
-| `font-mono` | JetBrains Mono | Numbers, codes, building IDs |
-
-### Status Colors (for `<Badge>`)
-
-| Status | Variant | Color |
-|--------|---------|-------|
-| Done | `done` | Teal |
-| In Progress | `progress` | Blue |
-| Stopped | `stopped` | Red |
-| Pending | `pending` | Amber |
-| Collaps | `collaps` | Purple |
+| `font-head` | Barlow Condensed | Page titles, KPI values |
+| `font-body` | Barlow | Body text, descriptions |
+| `font-mono` | JetBrains Mono | Numbers, codes, IDs |
 
 ---
 
-## Data Architecture
+## Development
 
-### Building Interface
-
-```typescript
-interface Building {
-  n: number              // unique sequence number (1–386)
-  proj: string           // 'Florya City' | 'Shary Daik'
-  desc: string           // building description
-  bldg: string           // building ID/code (e.g. 'A-01')
-  cost: number           // contract value in USD
-  status: BuildingStatus // 'Done' | 'in progress' | 'Stopped' | 'Pending' | 'Collaps'
-  pct: number            // completion 0.0–1.0 (NOT percent — multiply by 100 to display)
-  remark?: string
-
-  // Extended (from Excel upload — Phase 2+)
-  zone?: string
-  contractor?: string
-  plannedStart?: string
-  plannedEnd?: string
-  actualStart?: string
-  actualEnd?: string
-  salesStatus?: 'Sold' | 'Reserved' | 'Available'
-  salePrice?: number
-}
-```
-
-> **Critical:** `pct` is stored as a decimal (0.0 to 1.0). Always use `Math.round(b.pct * 100)` for display.
-
-### Data Flow
-
-```
-Excel Upload (Phase 2)
-    |
-    v
-SheetJS parse --> raw rows
-    |
-    v
-Zod schema validation --> typed Building[]
-    |
-    v
-useProjectStore.importBuildings()
-    |-- previousSnapshot  <-- current buildings (for delta comparison)
-    |-- buildings         <-- new data
-    |-- uploadHistory     <-- record appended (max 10)
-    |
-    v
-All pages re-render via store subscription
-```
-
-### Seed Data
-
-Before any Excel is uploaded, the app shows all 386 buildings from `lib/constants/seedData.ts`. This is the exact data migrated from the original HTML dashboard.
-
----
-
-## Pages & Features
-
-### `/executive` — Executive Summary
-- Portfolio progress (weighted average across all 386 buildings)
-- Total contract value
-- Completed vs active vs stopped counts
-- Project breakdown: Florya City vs Shary Daik progress rings
-- Status distribution bar chart
-- Trend delta arrows vs previous snapshot
-
-### `/overview` — Project Overview
-- Full 386-row buildings register
-- Search by building code or description
-- Filter by project (All / Florya City / Shary Daik)
-- Filter by status (All / Done / In Progress / Stopped / Pending / Collaps)
-- Sort by any column (click header, toggle asc/desc)
-- Pagination (25 rows/page)
-- Inline progress bars per building
-
-### `/engineering` — Engineering
-- Open RFI counter, In Review, Resolved counts
-- Engineering issues list with severity/status badges
-- Full RFI log and drawing tracker — Phase 2
-
-### `/field` — Field Operations
-- Active / stopped site counts
-- Active sites list with progress bars
-- Photo log placeholder (Phase 2)
-- Defect tracker placeholder (Phase 2)
-
-### `/financial` — Financial
-- Budget at Completion (BAC) — sum of all building costs
-- Earned Value (EV) — BAC multiplied by weighted progress
-- SPI (Schedule Performance Index) — EV / BAC
-- CPI placeholder (needs actual cost data from Excel)
-- EAC, ETC, VAC calculations
-- S-Curve placeholder (Phase 2)
-
-### `/sales` — Sales & Marketing
-- Shows sold / reserved / available counts if salesStatus data present
-- Falls back to empty state prompting Excel upload
-
-### `/risk` — Schedule & Risk
-- Risk register table with impact / probability / status badges
-- Schedule variance analysis placeholder (Phase 2)
-
-### `/documents` — Documents
-- Document type counters (Reports, Drawings, Contracts, Invoices)
-- Recent documents list with type/date/size
-- Full DMS with upload placeholder (Phase 2)
-
-### `/settings` — Settings
-- Project configs viewer (Florya City, Shary Daik budgets and targets)
-- Upload history log (last 10 uploads)
-- Data reset to seed data (with toast confirmation)
-- Config reset to defaults
-
-### `/gantt` — Gantt Schedule
-- Placeholder — requires plannedStart/plannedEnd/actualStart/actualEnd from Excel (Phase 2)
-
----
-
-## Zustand Stores
-
-### `useProjectStore` (persisted: `pske_project_v1`)
-
-```typescript
-{
-  buildings: Building[]           // active dataset — 386 from seed or from Excel
-  previousSnapshot: Building[]    // last state before import (for delta)
-  uploadHistory: UploadSnapshot[] // last 10 uploads
-  lastUploadDate: string | null
-
-  importBuildings(buildings, date): void   // saves prev snapshot, loads new data
-  resetToSeedData(): void                  // restore 386 seed buildings
-}
-```
-
-### `useConfigStore` (persisted: `pske_config_v1`)
-
-```typescript
-{
-  config: AppConfig   // projects[], reportingCurrency, portfolio targets
-  updateConfig(patch): void
-  resetConfig(): void
-}
-```
-
-Default config includes:
-- **Florya City** — $127M budget, target Dec 2026
-- **Shary Daik** — $83.7M budget, target Mar 2027
-
-### `useUIStore` (NOT persisted — resets on page load)
-
-```typescript
-{
-  sidebarCollapsed: boolean
-  alertCount: number
-  toggleSidebar(): void
-  setAlertCount(n): void
-}
+```bash
+npm run dev      # dev server at localhost:3000
+npm run build    # production build (must pass 0 errors)
+npx tsc --noEmit # type-check only
 ```
 
 ---
 
-## UI Components
+## Known Quirks
 
-### `<Card>`
-```tsx
-<Card padding="md" glow={false} className="">
-  {children}
-</Card>
-// padding: 'none' | 'sm' | 'md' | 'lg'
-// glow: adds teal box-shadow
-```
-
-### `<Badge>`
-```tsx
-<Badge variant="done">Done</Badge>
-<Badge variant="progress">In Progress</Badge>
-<Badge variant="stopped">Stopped</Badge>
-<Badge variant="pending">Pending</Badge>
-<Badge variant="collaps">Collapsed</Badge>
-<Badge variant="teal">Custom teal</Badge>
-<Badge variant="amber">Custom amber</Badge>
-<Badge variant="neutral">Neutral</Badge>
-```
-
-### `<KpiCard>`
-```tsx
-<KpiCard
-  label="Portfolio Progress"
-  value="23.5%"
-  sub="Weighted avg completion"
-  icon="◉"
-  accent="teal"          // 'teal' | 'amber' | 'red' | 'neutral'
-  trend={2}              // positive = up green, negative = down red
-  trendSuffix="%"
-  trendInvert={false}    // true when lower-is-better (e.g. delay days)
-/>
-```
-
-### `<ProgressRing>`
-```tsx
-<ProgressRing
-  pct={72}          // 0–100
-  size={64}         // px (default 64)
-  stroke={5}        // px (default 5)
-  color="#0dd9c4"   // CSS color
-  label="72%"       // optional center text override
-/>
-```
-
-### `<TrendArrow>`
-```tsx
-<TrendArrow value={3} suffix="%" />        // up 3% in teal
-<TrendArrow value={-2} />                  // down 2 in red
-<TrendArrow value={5} invert={true} />     // down 5 in red (lower is better)
-<TrendArrow value={0} />                   // dash (no change)
-```
-
-### `<SectionHeader>`
-```tsx
-<SectionHeader
-  title="Status Distribution"
-  subtitle="All buildings"
-  action={<button>Export</button>}   // optional right-side slot
-/>
-```
-
-### `<EmptyState>`
-```tsx
-<EmptyState
-  icon="📭"
-  title="No data yet"
-  description="Upload an Excel file to populate this section."
-  action={<button>Upload</button>}   // optional CTA
-/>
-```
+- Building codes (`bldg`) are not unique across projects — use `proj + bldg + n` as React key
+- Seed data has no `plannedStart`/`plannedEnd` — S-curve planned line appears only after a real Excel upload
+- `xlsx` package has a known prototype pollution CVE — accepted for internal trusted-file use only
+- Photos are stored as base64 in localStorage via Zustand persist — large numbers of high-res photos may approach browser storage limits (~5–10 MB)
 
 ---
 
-## Phase Roadmap
-
-### Phase 1 — Foundation (Complete)
-- [x] Next.js 16 scaffold with P-SKE design system
-- [x] Tailwind CSS v4 with full custom token set
-- [x] All TypeScript types (Building, Snapshot, Gantt, Risk, Defect, Financial, Document, Config)
-- [x] 386 buildings migrated to typed seed data
-- [x] Zustand stores (project, config, UI) with localStorage persist
-- [x] 7 UI primitives (Card, Badge, KpiCard, ProgressRing, SectionHeader, TrendArrow, EmptyState)
-- [x] Collapsible Sidebar + Topbar layout shell
-- [x] 10 functional pages
-
-### Phase 2 — Excel Import Pipeline
-- [ ] `lib/excel/parseExcel.ts` — SheetJS parse + column mapping
-- [ ] `lib/excel/validateSchema.ts` — Zod schema for Building fields
-- [ ] `lib/excel/excelToBuildings.ts` — transform + normalize
-- [ ] Upload button in Topbar — drag/drop modal
-- [ ] Toast feedback on success/error with row count
-- [ ] Dynamic Topbar — portfolio % and contract value from store
-
-### Phase 3 — Executive Enhancements
-- [ ] S-Curve chart (Recharts LineChart — planned vs actual cumulative %)
-- [ ] Snapshot delta table (buildings that changed status or %)
-- [ ] Trend arrows on all KPI cards
-
-### Phase 4 — Overview Enhancements
-- [ ] TanStack Table v8 (replace hand-rolled table)
-- [ ] Column visibility toggle
-- [ ] Export to CSV/Excel
-
-### Phase 5 — Gantt Schedule
-- [ ] Recharts custom Gantt bars per building
-- [ ] Group by project / zone / contractor
-- [ ] Today indicator line, delays highlighted in red
-
-### Phase 6 — Financial Deep Dive
-- [ ] Actual cost column from Excel upload
-- [ ] Real CPI/EAC calculation
-- [ ] Budget burn-down chart
-
-### Phase 7 — Export & Print
-- [ ] PDF export of Executive Summary (jsPDF + html2canvas)
-- [ ] Snapshot comparison PDF report
-
-### Phase 8 — Field & Documents
-- [ ] Photo log with GPS tagging per building
-- [ ] Defect tracker with photo evidence
-- [ ] Document upload + versioning
-
----
-
-## Excel Upload Schema (Phase 2)
-
-The Excel file should have one row per building with these columns:
-
-| Column | Type | Required | Notes |
-|--------|------|----------|-------|
-| `N` | number | Yes | Sequential number (1–386) |
-| `Project` | string | Yes | `Florya City` or `Shary Daik` |
-| `Description` | string | Yes | Building description |
-| `Building` | string | Yes | Building code (e.g. `A-01`) |
-| `Contract Value` | number | Yes | USD amount |
-| `Status` | string | Yes | `Done`, `in progress`, `Stopped`, `Pending`, `Collaps` |
-| `Progress %` | number | Yes | 0–100 (stored as 0.0–1.0 internally) |
-| `Remark` | string | No | Optional notes |
-| `Zone` | string | No | Site zone |
-| `Contractor` | string | No | Contractor name |
-| `Planned Start` | date | No | `YYYY-MM-DD` |
-| `Planned End` | date | No | `YYYY-MM-DD` |
-| `Actual Start` | date | No | `YYYY-MM-DD` |
-| `Actual End` | date | No | `YYYY-MM-DD` |
-| `Sales Status` | string | No | `Sold`, `Reserved`, `Available` |
-| `Sale Price` | number | No | USD amount |
-
----
-
-## Contributing
-
-This is an internal P-SKE platform. When adding features:
-
-1. Use the design system — `<Card>`, `<Badge>`, `<KpiCard>` etc., never duplicate raw styled divs
-2. All data from `useProjectStore` — never hardcode building counts or contract values in pages
-3. Keep `pct` as `0.0–1.0` in the store; multiply by 100 only at render time
-4. Add new pages to `NAV_ROUTES` in `lib/constants/routes.ts`
-5. Build must pass `npm run build` with zero errors before committing
-6. TypeScript strict — no `any`, no `as unknown`
-
----
-
-*P-SKE Construction Intelligence Platform — Next.js 16 · Tailwind CSS v4 · Zustand v5 · TypeScript*
+*P-SKE Construction Intelligence Platform · Next.js 16 · Tailwind CSS v4 · Zustand v5 · TypeScript*

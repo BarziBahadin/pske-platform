@@ -11,12 +11,12 @@ A Next.js 16 (App Router) project management control center for P-SKE's construc
 | Styling | Tailwind CSS v4 + custom P-SKE design tokens |
 | State | Zustand v5 with persist middleware |
 | Charts | Recharts v3 |
-| Tables | TanStack Table v8 (Phase 4) |
+| Tables | TanStack Table v8 |
 | Excel import | SheetJS (xlsx) + Zod validation |
 | Toast | Sonner |
 | Icons | Lucide React + emoji icons |
 | Dates | date-fns |
-| PDF export | jsPDF + html2canvas (Phase 7) |
+| PDF export | jsPDF + html2canvas |
 
 ## Design system rules
 - **Colors** — always use Tailwind tokens, never raw hex in className:
@@ -50,7 +50,14 @@ useConfigStore (persisted: pske_config_v1)
 
 useUIStore (NOT persisted)
   sidebarCollapsed
-  alertCount
+  mobileOpen
+
+useFieldStore (persisted: pske_field_v1)
+  photos[]     ← base64-compressed site photos linked to buildings
+  defects[]    ← defect tracker (open/in-review/resolved/closed)
+
+useDocumentStore (persisted: pske_docs_v1)
+  documents[]  ← document metadata registry
 ```
 
 ## Folder conventions
@@ -79,12 +86,12 @@ useUIStore (NOT persisted)
 |-------|--------|-------|
 | 1 | **Done** | Foundation: scaffold, design system, all stores, 7 UI primitives, 10 pages |
 | 2 | **Done** | Excel import pipeline (SheetJS → Zod → store), dynamic Topbar |
-| 3 | Planned | Executive S-Curve chart, snapshot diff with trend arrows |
-| 4 | Planned | TanStack Table in Overview (sort/filter/column visibility) |
-| 5 | Planned | Gantt chart (planned vs actual bars per building) |
-| 6 | Planned | Financial: real CPI/EAC from uploaded actual costs |
-| 7 | Planned | PDF export (jsPDF + html2canvas), print layout |
-| 8 | Planned | Photo log, defect tracker, document upload DMS |
+| 3 | **Done** | Executive S-Curve chart, snapshot diff with trend arrows |
+| 4 | **Done** | TanStack Table in Overview (sort/filter/column visibility) |
+| 5 | **Done** | Gantt chart (CSS bars, today marker, delay bars, project filters) |
+| 6 | **Done** | Financial: real CPI/EAC from actualCost, full EVM KPIs + charts |
+| 7 | **Done** | PDF export (jsPDF + html2canvas) on all major pages |
+| 8 | **Done** | Photo log, defect tracker (CRUD + lifecycle), document DMS |
 
 ## Commands
 ```bash
@@ -95,5 +102,6 @@ npx tsc --noEmit # type-check only
 
 ## Important — known quirks
 - `app/globals.css` exists from scaffold but is **unused** — root layout imports `@/styles/globals.css`
-- `Topbar.tsx` shows hardcoded portfolio pills until Phase 2 connects it to store
 - xlsx package has a known high-severity vulnerability (Prototype Pollution, ReDoS) — accepted for internal trusted-file use only
+- Photos are stored as base64 in localStorage via Zustand persist — large numbers of photos may approach browser storage limits
+- Building codes (`bldg`) are not unique across projects — use `proj + bldg + n` as React key
